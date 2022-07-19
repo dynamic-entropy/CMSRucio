@@ -2,7 +2,7 @@
 
 import typer
 from strictyaml import load, YAMLValidationError
-from lib.did_upload import datasetSchema, fileSchema, upload_dataset_and_create_rule, upload_file_and_create_rule, TemplateType
+from cms_rucio_import.lib.did_upload import datasetSchema, fileSchema, upload_dataset_and_create_rule, upload_file_and_create_rule, TemplateType
 from rucio.client import Client
 
 app = typer.Typer()
@@ -108,7 +108,3 @@ def generate_yaml_template(type: TemplateType = typer.Argument(..., case_sensiti
     typer.echo(f"Under development")
     typer.echo(f"Please copy files from src/rucio-user-dm/templates/")
     
-    
-
-if __name__=="__main__":
-    app()
