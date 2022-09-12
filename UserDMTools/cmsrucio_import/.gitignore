@@ -1,0 +1,5 @@
+../bin/
+../lib/python3.6/
+../lib64
+../pip-selfcheck.json
+../pyvenv.cfg
