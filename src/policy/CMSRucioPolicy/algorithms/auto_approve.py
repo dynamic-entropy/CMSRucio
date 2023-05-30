@@ -2,12 +2,24 @@
 Auto approve algorithm for CMS Rucio policy
 """
 
-from rucio.core.account import has_account_attribute
-from rucio.core.rule import list_rules
-from rucio.core.did import list_files
 import re
+from configparser import NoOptionError, NoSectionError
 
-GLOBAL_USAGE_THRESHOLD = 1e15
+from rucio.common.config import config_get
+from rucio.core.account import has_account_attribute
+from rucio.core.did import list_files
+from rucio.core.rule import list_rules
+
+try:
+    GLOBAL_USAGE_THRESHOLD = float(config_get('rules', 'global_usage_threshold', raise_exception=True, default=1e15))
+except (NoOptionError, NoSectionError, RuntimeError):
+    GLOBAL_USAGE_THRESHOLD = 1e15
+
+try:
+    RULE_LIFETIME_THRESHOLD = int(config_get('rules', 'rule_lifetime_threshold', raise_exception=True, default=2592000))
+except (NoOptionError, NoSectionError, RuntimeError):
+    RULE_LIFETIME_THRESHOLD = 2592000
+
 
 
 def global_approval(did, rule_attributes, session):
