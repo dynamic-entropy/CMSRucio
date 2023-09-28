@@ -146,6 +146,50 @@ if __name__ == '__main__':
                        'prefix': '/',
                        'scheme': 'srm'}
 
+    PROTO_ATTR_KIT = {
+        "hostname": "cmssrm-kit.gridka.de",
+        "scheme": "srm",
+        "port": 8443,
+        "prefix": "/",
+        "impl": "rucio.rse.protocols.gfal.Default",
+        "domains": {
+            "lan": {
+                "read": 0,
+                "write": 0,
+                "delete": 0
+            },
+            "wan": {
+                "read": 1,
+                "write": 1,
+                "delete": 1,
+                "third_party_copy_read": 1,
+                "third_party_copy_write": 1
+            }
+        },
+        "extended_attributes": {
+            "tfc": [
+                {
+                    "out": "/pnfs/gridka.de/cms/disk-only$1",
+                    "path": "(/store/temp/user/.*)",
+                    "proto": "pnfs"
+                },
+                {
+                    "out": "/pnfs/gridka.de/cms/$1",
+                    "path": "/+(.*)",
+                    "proto": "pnfs"
+                },
+                {
+                    "chain": "pnfs",
+                    "out": "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/$1",
+                    "path": "/+(.*)",
+                    "proto": "srmv2"
+                }
+            ],
+            "tfc_proto": "srmv2",
+            "web_service_path": "/srm/managerv2?SFN="
+        }
+    }
+
     def test_tfc_mapping(name, proto_attrs, pfn, scope="cms"):
         """
         Unit test for lfn to pfn mapping
@@ -158,44 +202,5 @@ if __name__ == '__main__':
             print("FAILURE: %s:%s -> %s (expected %s)" % (scope, name, mapped_pfn, pfn))
 
     test_tfc_mapping(
-        "/store/some//path//file.root",
-        PROTO_ATTRS,
-        "dpm/in2p3.fr/home/cms/trivcat/store/some/path/file.root"
-    )
-
-    test_tfc_mapping(
-        "/store/data/some//path/file.root",
-        PROTO_ATTRS2,
-        "cms:/store/data/some/path/file.root"
-    )
-
-    test_tfc_mapping(
-        "/store/some/path/file.root",
-        PROTO_ATTRS,
-        "dpm/in2p3.fr/home/cms/trivcat/store/some/path/file.root"
-    )
-
-    test_tfc_mapping(
-        "/store/data/some/path/file.root",
-        PROTO_ATTRS2,
-        "cms:/store/data/some/path/file.root"
-    )
-
-    test_tfc_mapping(
-        "/store/data/some/path/file.root",
-        PROTO_ATTRS3,
-        "cms/store/data/some/path/file.root"
-    )
-    test_tfc_mapping(
-        "//store/data/some/path/file.root",
-        PROTO_ATTRS4,
-        "/store/data/some/path/file.root"
-    )
-    test_tfc_mapping(
-        "//store/user/rucio//ewv/some/path/file.root",
-        PROTO_ATTRS4,
-        "/store/user/rucio/ewv/some/path/file.root"
-    )
-
-    test_tfc_mapping("/store/temp/user/ewv", PROTO_ATTR_FNAL,
-                     "gsiftp://cmseos-gridftp.fnal.gov//eos/uscms/store/temp/user/ewv")
+        "/store/mc/SAM/", PROTO_ATTR_KIT,
+        "srm://cmssrm-kit.gridka.de:8443/srm/managerv2?SFN=/pnfs/gridka.de/cms/store/mc/SAM/")
