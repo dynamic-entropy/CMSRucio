@@ -1,3 +1,5 @@
+import gfal2
+
 from rucio.client import Client
 from argparse import ArgumentParser
 
@@ -27,13 +29,21 @@ def create_write_rule(client, rse, scope, name):
     print(f"https://cms-rucio-webui.cern.ch/rule?rule_id={rse_id}")
 
 
-def create_read_rule(client, rse, scope, name, read_to_rse):
+def create_read_rule(client, ctx, rse, scope, name, read_to_rse):
+    files = client.list_replicas([{'scope': scope, 'name': name}], all_states=True, rse_expression=rse)
+    pfns = [file["rses"][rse][0] for file in files]
+
+    for pfn in pfns:
+        status = ctx.getxattr(pfn, 'user.status')
+        if status != 'NEARLINE':
+            print(f"File {pfn} is on buffer, files should only be on tape")
+            exit(1)
     # create rule to the rse
     rse_id = client.add_replication_rule(dids=[{'scope': scope, 'name': name}],
                                          copies=1, rse_expression=read_to_rse, grouping='DATASET', lifetime=86400,
                                          activity='Debug',
                                          comment="Testing tape http rest read operation",
-                                         source_replica_expression=rse)
+                                         source_replica_expression=rse)[0]
 
     print("Rule created: %s" % rse_id)
     print(f"https://cms-rucio-webui.cern.ch/rule?rule_id={rse_id}")
@@ -66,6 +76,7 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     client = Client()
+    ctx = gfal2.creat_context()
     rse = args.rse
     mode = args.mode
 
@@ -95,4 +106,4 @@ if __name__ == "__main__":
         elif mode == 'read':
             name = rule['name']
             scope = rule['scope']
-            create_read_rule(client, rse, scope, name, reard_to_rse)
+            create_read_rule(client, ctx, rse, scope, name, reard_to_rse)
