@@ -1,7 +1,9 @@
-import gfal2
+
 
 from rucio.client import Client
 from argparse import ArgumentParser
+
+from fetch_locality import get_locality
 
 
 def set_davs_endpoint(client, rse):
