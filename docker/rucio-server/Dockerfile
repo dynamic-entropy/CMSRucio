@@ -28,5 +28,6 @@ RUN mkdir -p /patch
 
 # Patch for auto approve plugin rucio/pull/6215
 ADD https://github.com/rucio/rucio/pull/6215.patch /patch/6215.patch
+ADD https://raw.githubusercontent.com/dynamic-entropy/rucio/0984c22099efeb0c629e9ab93b8b7005aaf5413b/debug_permission_policy.patch /patch/debugpermission.patch
 
 ENTRYPOINT ["/cms-entrypoint.sh"]
