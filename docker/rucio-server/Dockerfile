@@ -26,7 +26,7 @@ RUN /tmp/install_mail_templates.sh
 # Cannot make patch directory unless there are patches
 RUN mkdir -p /patch
 
-# Patch for auto approve plugin rucio/pull/6215
-ADD https://github.com/rucio/rucio/pull/6215.patch /patch/6215.patch
+# # Patch for auto approve plugin rucio/pull/6215
+# ADD https://github.com/rucio/rucio/pull/6215.patch /patch/6215.patch
 
 ENTRYPOINT ["/cms-entrypoint.sh"]

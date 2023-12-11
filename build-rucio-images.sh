@@ -2,8 +2,8 @@
 
 set -e
 
-export RUCIO_VERSION=32.3.1
-export CMS_VERSION=${RUCIO_VERSION}.cms1
+export RUCIO_VERSION=33.0.0
+export CMS_VERSION=${RUCIO_VERSION}.rc1
 
 export HARBOR=registry.cern.ch/cmsrucio
 
