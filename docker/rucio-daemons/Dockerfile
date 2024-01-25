@@ -37,7 +37,9 @@ ADD docker/rucio-daemons/cms-entrypoint.sh /
 # ADD https://raw.githubusercontent.com/ericvaandering/containers/add_preparer/daemons/rucio.cfg.j2 /tmp/rucio.cfg.j2
 
 # Cannot make patch directory unless there are patches
-#RUN mkdir -p /patch
+RUN mkdir -p /patch
+
+ADD https://raw.githubusercontent.com/dynamic-entropy/rucio/oidc_debug_patch/oidc_debug.patch /patch/oidc_debug.patch
 
 # Patch for auto approve plugin rucio/pull/6215
 #ADD https://github.com/rucio/rucio/pull/6215.patch /patch/6215.patch
