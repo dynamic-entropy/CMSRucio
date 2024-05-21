@@ -9,48 +9,47 @@ def mimic_rse_links(client, rse_to_mimic, rse_to_set, dry_run=False):
 
     for rse in rses:
         # get distance for reference rse
-        a = client.get_distance(rse['rse'], rse_to_mimic)[0]
-        b = client.get_distance(rse_to_mimic, rse['rse'])[0]
+        a = client.get_distance(rse['rse'], rse_to_mimic)
+        b = client.get_distance(rse_to_mimic, rse['rse'])
 
         # Add same distances for rse in concern
+        if len(a) != 0:
+            a = a[0]
+            try:
+                print(f"Setting distance from {rse['rse']} to {rse_to_set} to {a['distance']}")
+                if not dry_run:
+                    client.add_distance(rse['rse'], rse_to_set, {'distance': a['distance']})
+            except Duplicate:
+                print(f"Distance from {rse['rse']} to {rse_to_set} already exists")
+                client.update_distance(rse['rse'], rse_to_set, {'distance': a['distance']})
+            except Exception as e:
+                print(f"Failed to set distance from {rse['rse']} to {rse_to_set}", e)
+        # else:
+        #     print(f"Distance from {rse['rse']} to {rse_to_mimic} does not exists")
 
-        try:
-            print(
-                f"Setting distance from {rse['rse']} to {rse_to_set} to {a['distance']}")
-            if not dry_run:
-                client.add_distance(rse['rse'], rse_to_set, {
-                                    'distance': a['distance']})
-        except Duplicate:
-            print(f"Distance from {rse['rse']} to {rse_to_set} already exists")
-            client.update_distance(rse['rse'], rse_to_set, {
-                                   'distance': a['distance']})
-        except Exception as e:
-            print(
-                f"Failed to set distance from {rse['rse']} to {rse_to_set}", e)
-
-        try:
-            print(
-                f"Setting distance from {rse_to_set} to {rse['rse']} to {b['distance']}")
-            client.add_distance(rse_to_set, rse['rse'], {
-                                'distance': b['distance']})
-        except Duplicate:
-            print(f"Distance from {rse_to_set} to {rse['rse']} already exists")
-            client.update_distance(rse_to_set, rse['rse'], {
-                                   'distance': b['distance']})
-        except Exception as e:
-            print(
-                f"Failed to set distance from {rse_to_set} to {rse['rse']}", e)
+        if len(b) != 0:
+            b = b[0]
+            try:
+                print(f"Setting distance from {rse_to_set} to {rse['rse']} to {b['distance']}")
+                client.add_distance(rse_to_set, rse['rse'], {'distance': b['distance']})
+            except Duplicate:
+                print(f"Distance from {rse_to_set} to {rse['rse']} already exists")
+                client.update_distance(rse_to_set, rse['rse'], {'distance': b['distance']})
+            except Exception as e:
+                print(f"Failed to set distance from {rse_to_set} to {rse['rse']}", e)
+        # else:
+        #     print(f"Distance from {rse_to_mimic} to {rse['rse']} does not exists")
 
 # Verfify successful operation
 
 
 def verify_rse_links(client, rse_to_mimic, rse_to_set):
     for rse in client.list_rses():
-        a1 = client.get_distance(rse['rse'], rse_to_set)[0]
-        b1 = client.get_distance(rse_to_set, rse['rse'])[0]
+        a1 = client.get_distance(rse['rse'], rse_to_set)[0] if len(client.get_distance(rse['rse'], rse_to_set)) !=0 else None
+        b1 = client.get_distance(rse_to_set, rse['rse'])[0] if len(client.get_distance(rse_to_set, rse['rse'])) !=0 else None
 
-        a2 = client.get_distance(rse['rse'], rse_to_mimic)[0]
-        b2 = client.get_distance(rse_to_mimic, rse['rse'])[0]
+        a2 = client.get_distance(rse['rse'], rse_to_mimic)[0] if len(client.get_distance(rse['rse'], rse_to_mimic)) !=0 else None
+        b2 = client.get_distance(rse_to_mimic, rse['rse'])[0] if len(client.get_distance(rse_to_mimic, rse['rse'])) !=0 else None
 
         try:
             assert a1['distance'] == a2['distance']
